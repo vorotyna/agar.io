@@ -25,6 +25,12 @@ function Blob(x, y, r) {
     }
   };
 
+  // A method to contrain blob movement
+  this.constrain = function() {
+    blob.pos.x = constrain(blob.pos.x, -width, width);
+    blob.pos.y = constrain(blob.pos.y, -height, height);
+  };
+
   // A method of the Blob class responsible for diplaying the blob on the canvas
   this.show = function() {
     fill(255); // Sets the fill color

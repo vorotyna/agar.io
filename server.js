@@ -45,11 +45,12 @@ io.sockets.on(
     });
 
 
+    // Synchronize the position and size of the blob between the server and the connected clients
     socket.on('update', function(data) {
       console.log(socket.id + " " + data.x + " " + data.y + " " + data.r);
       let blob;
       for (let i = 0; i < blobs.length; i++) { // Updates the location in the array of blobs
-        if (socket.id == blobs[i].id) {
+        if (socket.id == blobs[i].id) { // If the socket id equals the blobs id then update blob object with the values received in data
           blob = blobs[i];
         }
       }
