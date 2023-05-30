@@ -2,6 +2,7 @@
 let socket;
 
 let blob;
+let id;
 
 let blobs = []; // Holds an array of different blobs
 let zoom = 1;
@@ -38,13 +39,21 @@ function draw() {
   translate(-blob.pos.x, -blob.pos.y); // Translates the coordinate system to follow the position of the Blob - where world moves in the opposite direction of the Blob position (giving illusion that the world is moving relative to Blob)
 
   for (let i = blobs.length - 1; i >= 0; i--) { // Show the blobs (i.e., 'food' blobs)
-    fill(0, 0, 225);
-    ellipse(blobs[i].x, blobs[i].y, blobs[i].r * 2, blobs[i].r * 2);
+    let id = blobs[i].id;
 
-    fill(255);
-    textAlign(CENTER);
-    textSize(4);
-    text(blobs[i].id, blobs[i].x, blobs[i].y + blobs[i].r);
+    // If it is not the Client's own blob, then draw blob
+    if (id.substring(2, id.length) !== socket.id) {
+      // Blob styling
+      fill(0, 0, 225); // Colour blue
+      ellipse(blobs[i].x, blobs[i].y, blobs[i].r * 2, blobs[i].r * 2);
+
+      // Text styling
+      fill(255); // Colour white
+      textAlign(CENTER);
+      textSize(4);
+      text(blobs[i].id, blobs[i].x, blobs[i].y + blobs[i].r);
+    }
+
 
     // blobs[i].show();
 
