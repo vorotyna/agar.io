@@ -33,7 +33,7 @@ let io = require('socket.io')(server);
 // Have the server send a message (through the heartbeat function) to the client every second (1000ms)
 setInterval(heartbeat, 1000);
 function heartbeat() {
-  io.sockets.emit('heartbeat', "hello");
+  io.sockets.emit('heartbeat', blobs);
 }
 
 

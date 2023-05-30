@@ -23,7 +23,8 @@ function setup() {
   // On the 'heartbeat' event, console log to the client (frontend)
   socket.on('heartbeat',
     function(data) {
-      console.log(data);
+      // console.log(data);
+      blobs = data;
     }
   );
 }
@@ -37,12 +38,20 @@ function draw() {
   translate(-blob.pos.x, -blob.pos.y); // Translates the coordinate system to follow the position of the Blob - where world moves in the opposite direction of the Blob position (giving illusion that the world is moving relative to Blob)
 
   for (let i = blobs.length - 1; i >= 0; i--) { // Show the blobs (i.e., 'food' blobs)
-    blobs[i].show();
+    fill(0, 0, 225);
+    ellipse(blobs[i].x, blobs[i].y, blobs[i].r * 2, blobs[i].r * 2);
 
-    // If Blob eats one of the blobs, then remove one blob from blobs and Blob grows
-    if (blob.eats(blobs[i])) {
-      blobs.splice(i, 1); // Remove one element starting at index i 
-    }
+    fill(255);
+    textAlign(CENTER);
+    textSize(4);
+    text(blobs[i].id, blobs[i].x, blobs[i].y + blobs[i].r);
+
+    // blobs[i].show();
+
+    // // If Blob eats one of the blobs, then remove one blob from blobs and Blob grows
+    // if (blob.eats(blobs[i])) {
+    //   blobs.splice(i, 1); // Remove one element starting at index i 
+    // }
   }
 
   blob.show(); // Show the main player blob
