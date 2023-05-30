@@ -20,8 +20,8 @@ function setup() {
   };
   socket.emit('start', data);
 
+  // On the 'heartbeat' event, console log to the client (frontend)
   socket.on('heartbeat',
-    // When we receive data
     function(data) {
       console.log(data);
     }
