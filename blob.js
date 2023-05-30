@@ -15,7 +15,8 @@ function Blob(x, y, r) {
   this.eats = function(other) {
     let d = p5.Vector.dist(this.pos, other.pos); // Calculate distance between Blob and other blob
     if (d < this.r + other.r) { // If the distance is less than the radius of both Blobs added, means they are overlapping (i.e., being eaten by Blob)
-      this.r += other.r * 0.2; // Blob increases in radius by the size of food blob
+      let sum = PI * this.r * this.r + PI * other.r * other.r; // Sum of areas of both blobs (i.e., A = PI * r^2)
+      this.r = sqrt(sum / PI); // Solve for new radius of Blob based on the area previously calculated
       return true;
     } else {
       return false;
