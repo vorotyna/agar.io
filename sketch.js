@@ -6,16 +6,18 @@ function setup() {
   createCanvas(600, 600); // Canavas size
   blob = new Blob(width / 2, height / 2, 64);
   for (let i = 0; i < 50; i++) {
-    blobs[i] = new Blob(random(width), random(height), 16); // Creates new blobs in array with random height, random width, and radius of 16
+    let x = random(-width, width * 2); // Generate random x value that can be positioned within the canvas area or outside of it
+    let y = random(-height, height * 2); // Generate random y value that can be positioned within the canvas area or outside of it
+    blobs[i] = new Blob(x, y, 16); // Creates new blobs in array with random height, random width, and radius of 16
   }
 }
 
 function draw() {
   background(0);
   translate(width / 2 - blob.pos.x, width / 2 - blob.pos.y); // Translates the origin of the screen so that it appears that the screen (i.e., 'map') moves with the blob
-  blob.show();
-  blob.update();
-  for (let i = 0; i < blobs.length; i++) {
+  blob.show(); // Show the main player blob
+  blob.update(); // Update blob position when mouse moves
+  for (let i = 0; i < blobs.length; i++) { // Show the blobs (i.e., 'food' blobs)
     blobs[i].show();
   }
 }
