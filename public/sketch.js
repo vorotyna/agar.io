@@ -12,11 +12,14 @@ function setup() {
   socket = io.connect('http://localhost:3000');
 
   blob = new Blob(0, 0, 64);
-  for (let i = 0; i < 50; i++) {
-    let x = random(-width, width); // Generate random x value that can be positioned within the canvas area or outside of it
-    let y = random(-height, height); // Generate random y value that can be positioned within the canvas area or outside of it
-    blobs[i] = new Blob(x, y, 16); // Creates new blobs in array with random height, random width, and radius of 16
-  }
+  // Make a little object with x and y
+  let data = {
+    x: blob.x,
+    y: blob.y,
+    r: blob.r,
+  };
+  socket.emit('start', data);
+
 }
 
 function draw() {

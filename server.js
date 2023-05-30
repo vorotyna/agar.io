@@ -1,3 +1,13 @@
+let blobs = []; // All of the blobs/clients that are currently connected
+
+// Constructor function 
+function Blob(id, x, y, r) {
+  this.id = id;
+  this.x = x;
+  this.y = y;
+  this.r = r;
+}
+
 // Using express: http://expressjs.com/
 let express = require('express');
 // Create the app
@@ -30,9 +40,10 @@ io.sockets.on(
 
     socket.on('start', function(data) {
       console.log(socket.id + ' ' + data.x + ' ' + data.y + ' ' + data.r);
-      let blob = new Blob(socket.id, data.x, data.y, data.r);
-      blobs.push(blob);
+      let blob = new Blob(socket.id, data.x, data.y, data.r); // Create a blob when we have a new client
+      blobs.push(blob); // Push this new blob into our list of blobs / clients
     });
+
 
     socket.on('update', function(data) {
       //console.log(socket.id + " " + data.x + " " + data.y + " " + data.r);
@@ -50,5 +61,5 @@ io.sockets.on(
     socket.on('disconnect', function() {
       console.log('Client has disconnected');
     });
-  }
-);
+  });
+
