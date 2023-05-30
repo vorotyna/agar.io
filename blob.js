@@ -6,8 +6,7 @@ function Blob(x, y, r) {
 
   // A method to update the position of the blob based on the mouse position
   this.update = function() {
-    let vel = createVector(mouseX, mouseY); // Creates a velocity vector using the mouse positions
-    vel.sub(this.pos); // Subtracts the this.pos vector from the vel vector
+    let vel = createVector(mouseX - width / 2, mouseY - height / 2); // Creates a velocity vector using the mouse positions
     vel.setMag(3); // Sets the magnitude (length) of the vel vector to 3
     this.pos.add(vel); // Adds vel vector to the this.pos vector
   };
