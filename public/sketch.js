@@ -41,4 +41,12 @@ function draw() {
 
   blob.show(); // Show the main player blob
   blob.update(); // Update blob position when mouse moves
+
+  // Update location continuously in draw()
+  let data = {
+    x: blob.pos.x,
+    y: blob.pos.y,
+    r: blob.r,
+  };
+  socket.emit('update', data);
 }

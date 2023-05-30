@@ -46,9 +46,9 @@ io.sockets.on(
 
 
     socket.on('update', function(data) {
-      //console.log(socket.id + " " + data.x + " " + data.y + " " + data.r);
+      console.log(socket.id + " " + data.x + " " + data.y + " " + data.r);
       let blob;
-      for (let i = 0; i < blobs.length; i++) {
+      for (let i = 0; i < blobs.length; i++) { // Updates the location in the array of blobs
         if (socket.id == blobs[i].id) {
           blob = blobs[i];
         }
