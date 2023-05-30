@@ -15,7 +15,6 @@ function setup() {
 
 function draw() {
   background(0); // Sets background colour to black
-  // translate(width / 2 - blob.pos.x, height / 2 - blob.pos.y); // Translates the origin of the screen so that it appears that the screen (i.e., 'map') moves with the blob
   translate(width / 2, height / 2); // Translates origin of the coordinate system to the center of the canvas
   let newzoom = 64 / blob.r; // Calculates the new zoom level based on the radius of the blob - the larger the radius, the smaller the zoom level
   zoom = lerp(zoom, newzoom, 0.1); // Interpolates the current zoom level towards the new zoom level gradually
