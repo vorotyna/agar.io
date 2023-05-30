@@ -15,6 +15,7 @@ function setup() {
 function draw() {
   background(0);
   translate(width / 2 - blob.pos.x, width / 2 - blob.pos.y); // Translates the origin of the screen so that it appears that the screen (i.e., 'map') moves with the blob
+  scale(64 / blob.r); // Scale coordinate system to expand the world
 
   for (let i = blobs.length - 1; i >= 0; i--) { // Show the blobs (i.e., 'food' blobs)
     blobs[i].show();
