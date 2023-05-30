@@ -1,3 +1,6 @@
+// Keep track of our socket information
+let socket;
+
 let blob;
 
 let blobs = []; // Holds an array of different blobs
@@ -5,6 +8,9 @@ let zoom = 1;
 
 function setup() {
   createCanvas(600, 600); // Canavas size
+  // Start a socket connection to the server
+  socket = io.connect('http://localhost:3000');
+
   blob = new Blob(0, 0, 64);
   for (let i = 0; i < 50; i++) {
     let x = random(-width, width); // Generate random x value that can be positioned within the canvas area or outside of it
