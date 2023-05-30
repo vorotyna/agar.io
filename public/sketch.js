@@ -20,6 +20,12 @@ function setup() {
   };
   socket.emit('start', data);
 
+  socket.on('heartbeat',
+    // When we receive data
+    function(data) {
+      console.log(data);
+    }
+  );
 }
 
 function draw() {

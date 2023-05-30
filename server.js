@@ -30,6 +30,13 @@ app.use(express.static('public'));
 // WebSockets work with the HTTP server
 let io = require('socket.io')(server);
 
+// Have the servern send a message (through the heartbeat function) to the client every second (1000ms)
+setInterval(heartbeat, 1000);
+function heartbeat() {
+  io.sockets.emit('heartbeat', "hello");
+}
+
+
 // Register a callback function to run when we have an individual connection
 // This is run for each individual user that connects
 io.sockets.on(
