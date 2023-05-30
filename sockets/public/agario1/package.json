@@ -2,7 +2,7 @@
   "name": "agar.io",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "sketch.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -11,7 +11,7 @@
     "url": "git+https://github.com/vorotyna/agar.io.git"
   },
   "keywords": [],
-  "author": "",
+  "author": "Alisa Vorotyntseva",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/vorotyna/agar.io/issues"
