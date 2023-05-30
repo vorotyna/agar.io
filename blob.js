@@ -11,6 +11,17 @@ function Blob(x, y, r) {
     this.pos.add(vel); // Adds vel vector to the this.pos vector
   };
 
+  // A method handles the size of the Blob when it overlaps (i.e., 'eats') a small blob
+  this.eats = function(other) {
+    let d = p5.Vector.dist(this.pos, other.pos); // Calculate distance between Blob and other blob
+    if (d < this.r + other.r) { // If the distance is less than the radius of both Blobs added, means they are overlapping (i.e., being eaten by Blob)
+      this.r += other.r * 0.2; // Blob increases in radius by the size of food blob
+      return true;
+    } else {
+      return false;
+    }
+  };
+
   // A method of the Blob class responsible for diplaying the blob on the canvas
   this.show = function() {
     fill(255); // Sets the fill color

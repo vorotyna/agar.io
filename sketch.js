@@ -21,10 +21,8 @@ function draw() {
 
     // If Blob eats one of the blobs, then remove one blob from blobs and Blob grows
     if (blob.eats(blobs[i])) {
-      blobs[i].splice(0, 1);
-      blob.grows();
+      blobs.splice(i, 1); // Remove one element starting at index i 
     }
-    blobs[i].show();
   }
 
   blob.show(); // Show the main player blob
