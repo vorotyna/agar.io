@@ -11,11 +11,11 @@ function setup() {
   // Start a socket connection to the server
   socket = io.connect('http://localhost:3000');
 
-  blob = new Blob(0, 0, 64);
+  blob = new Blob(random(width), random(height), random(8, 24));
   // Make a little object with x and y
   let data = {
-    x: blob.x,
-    y: blob.y,
+    x: blob.pos.x,
+    y: blob.pos.y,
     r: blob.r,
   };
   socket.emit('start', data);
