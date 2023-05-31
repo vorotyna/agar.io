@@ -31,7 +31,7 @@ app.use(express.static('public'));
 let io = require('socket.io')(server);
 
 // Have the server send a message (through the heartbeat function) to the client every second (1000ms)
-setInterval(heartbeat, 1000);
+setInterval(heartbeat, 33);
 function heartbeat() {
   io.sockets.emit('heartbeat', blobs);
 }
@@ -54,7 +54,7 @@ io.sockets.on(
 
     // Synchronize the position and size of the blob between the server and the connected clients
     socket.on('update', function(data) {
-      console.log(socket.id + " " + data.x + " " + data.y + " " + data.r);
+      // console.log(socket.id + " " + data.x + " " + data.y + " " + data.r);
       let blob;
       for (let i = 0; i < blobs.length; i++) { // Updates the location in the array of blobs
         if (socket.id == blobs[i].id) { // If the socket id equals the blobs id then update blob object with the values received in data

@@ -64,7 +64,9 @@ function draw() {
   }
 
   blob.show(); // Show the main player blob
-  blob.update(); // Update blob position when mouse moves
+  if (mouseIsPressed) {
+    blob.update(); // Update blob position when mouse moves
+  }
   blob.constrain();
 
   // Update location continuously in draw()
