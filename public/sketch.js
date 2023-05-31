@@ -8,7 +8,7 @@ let blobs = []; // Holds an array of different blobs
 let zoom = 1;
 
 function setup() {
-  createCanvas(600, 600); // Canavas size
+  createCanvas(windowWidth, windowHeight); // Canavas size
   // Start a socket connection to the server
   socket = io.connect('http://localhost:3000');
 
@@ -76,4 +76,9 @@ function draw() {
     r: blob.r,
   };
   socket.emit('update', data);
+}
+
+// Resize the canvas if someone changes the window size
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
 }
