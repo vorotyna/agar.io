@@ -8,7 +8,8 @@ let blobs = []; // Holds an array of different blobs
 let zoom = 1;
 
 function setup() {
-  createCanvas(windowWidth, windowHeight); // Canavas size
+  createCanvas(windowWidth, windowHeight); // Canvas size
+
   // Start a socket connection to the server
   socket = io.connect('http://localhost:3000');
 
@@ -31,7 +32,18 @@ function setup() {
 }
 
 function draw() {
-  background(0); // Sets background colour to black
+  background(255); // Sets background colour to black
+
+  // Draw grid lines in the background
+  let gridSize = 50; // Size of each grid cell
+  stroke(225); // Color of grid lines
+  for (let x = 0; x < width; x += gridSize) {
+    line(x, 0, x, height); // Vertical lines
+  }
+  for (let y = 0; y < height; y += gridSize) {
+    line(0, y, width, y); // Horizontal lines
+  }
+
   translate(width / 2, height / 2); // Translates origin of the coordinate system to the center of the canvas
   let newzoom = 64 / blob.r; // Calculates the new zoom level based on the radius of the blob - the larger the radius, the smaller the zoom level
   zoom = lerp(zoom, newzoom, 0.1); // Interpolates the current zoom level towards the new zoom level gradually
