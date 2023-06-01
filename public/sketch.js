@@ -32,7 +32,7 @@ function setup() {
 }
 
 function draw() {
-  background(255); // Sets background colour to black
+  background(255); // Sets background colour to white
 
   // Draw grid lines in the background
   let gridSize = 50; // Size of each grid cell
