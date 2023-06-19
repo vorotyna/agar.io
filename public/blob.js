@@ -1,9 +1,12 @@
 // Constructor for creating instances of the Blob class
-function Blob(x, y, r) {
+function Blob(x, y, r, colourR, colourG, colourB) {
   // A vector object stores an x and y component for a position on the screen, etc.
   this.pos = createVector(x, y); // Current position of Blob as a vector
   this.r = r; // Radius
   this.vel = createVector(0, 0); // Current velocity of Blob as a vector
+  this.colourR = colourR; // Fill colour for Blob
+  this.colourG = colourG; // Fill colour for Blob
+  this.colourB = colourB; // Fill colour for Blob
 
   // A method to update the position of the blob based on the mouse position
   this.update = function() {
@@ -31,9 +34,11 @@ function Blob(x, y, r) {
     blob.pos.y = constrain(blob.pos.y, -height, height);
   };
 
+
+
   // A method of the Blob class responsible for diplaying the blob on the canvas
   this.show = function() {
-    fill(255); // Sets the fill color
+    fill(colourR, colourG, colourB); // Sets the fill color
     ellipse(this.pos.x, this.pos.y, this.r * 2, this.r * 2); // Size of the ellipse
   };
 }

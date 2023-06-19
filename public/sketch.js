@@ -13,19 +13,23 @@ function setup() {
   // Start a socket connection to the server
   socket = io.connect('http://localhost:3000');
 
-  blob = new Blob(random(width), random(height), random(8, 24));
-  // Make a little object with x and y
+  blob = new Blob(0, 0, 20, random(200, 255), random(100, 255), random(200, 255)); // Make our Blob 
+  // Make an object with the Blob's data
   let data = {
     x: blob.pos.x,
     y: blob.pos.y,
     r: blob.r,
+    colourR: blob.colourR,
+    colourG: blob.colourG,
+    colourB: blob.colourB
   };
+
   socket.emit('start', data);
 
   // On the 'heartbeat' event, console log to the client (frontend)
   socket.on('heartbeat',
     function(data) {
-      // console.log(data);
+      console.log(data);
       blobs = data;
     }
   );
@@ -56,7 +60,7 @@ function draw() {
     // If it is not the Client's own blob, then draw blob
     if (id.substring(2, id.length) !== socket.id) {
       // Blob styling
-      fill(0, 0, 225); // Colour blue
+      fill(blobs[i].a, blobs[i].b, blobs[i].c); // Colour blob accodringly
       ellipse(blobs[i].x, blobs[i].y, blobs[i].r * 2, blobs[i].r * 2);
 
       // Text styling
