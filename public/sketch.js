@@ -22,16 +22,16 @@ function setup() {
   createCanvas(windowWidth, windowHeight); // Setup canvas size
 
   // Create a loop where food blobs are created into the food array
-  for (let i = 0; i <= 300; i++) {
+  for (let i = 0; i <= 250; i++) {
     let x = random(-width, width); // Generate random x value that can be positioned within the canvas area or outside of it
     let y = random(-height, height); // Generate random y value that can be positioned within the canvas area or outside of it
-    food[i] = new Blob(x, y, 8, 55, 0, 0); // Creates new food blobs in food array with random height, random width, radius of 16, and RGB of 55,0,0
+    food[i] = new Blob(x, y, 8, random(200, 255), random(100, 255), random(200, 255)); // Creates new food blobs in food array with random height, random width, radius of 16, and RGB of 55,0,0
   }
 
   // Start a socket connection to the server
   socket = io.connect('http://localhost:3000');
 
-  blob = new Blob(0, 0, 16, random(200, 255), random(100, 255), random(200, 255)); // Make our Blob // CHANGE FROM 0,0 TO RANDOM(HEIGHT), RANDOM(WIDTH)
+  blob = new Blob(0, 0, 16, random(100, 255), random(100, 255), random(100, 255)); // Make our Blob // CHANGE FROM 0,0 TO RANDOM(HEIGHT), RANDOM(WIDTH)
   // Make an object with the Blob's data
   let data = {
     x: blob.pos.x,
@@ -97,18 +97,20 @@ function draw() {
       textSize(4);
       text(blobs[i].id, blobs[i].x, blobs[i].y + blobs[i].r);
     }
-
-
-    // blobs[i].show();
-
-    // // If Blob eats one of the blobs, then remove one blob from blobs and Blob grows
-    // if (blob.eats(blobs[i])) {
-    //   blobs.splice(i, 1); // Remove one element starting at index i 
-    // }
   }
 
   for (let i = 0; i < food.length; i++) { // Show the food blobs
+
     food[i].show();
+
+    // If Blob eats one of the blobs, then remove one blob from food and Blob grows
+    if (blob.eats(food[i])) {
+      food.splice(i, 1); // Remove one element starting at index i 
+      // Replace with a new food blob
+      let x = random(-width, width); // Generate random x value that can be positioned within the canvas area or outside of it
+      let y = random(-height, height); // Generate random y value that can be positioned within the canvas area or outside of it
+      food.push(new Blob(x, y, 8, random(200, 255), random(100, 255), random(200, 255))); // Creates new food blobs in food array with random height, random width, radius of 16, and RGB of 55,0,0
+    }
   }
 
 
@@ -126,6 +128,8 @@ function draw() {
   };
   socket.emit('update', data);
 }
+
+
 
 
 
