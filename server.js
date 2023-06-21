@@ -56,11 +56,28 @@ io.sockets.on(
   function(socket) {
     console.log('We have a new client: ' + socket.id);
 
-    socket.on('start', function(data) {
+
+
+
+
+
+    socket.on('start', function(data, foodsData) {
       console.log(`STARTING: ${socket.id} ${data.x} ${data.y} ${data.r}`);
-      let blob = new Blob(socket.id, data.x, data.y, data.r, data.colourR, data.colourG, data.colourB); // Create a blob when we have a new client
+
+      let blob = new Blob(socket.id, data.x, data.y, data.r, data.colourR, data.colourG, data.colourB); // Recreate main player blob on the server side
       blobs.push(blob); // Push this new blob into our list of blobs / clients
+
+      for (let i = 0; i < foodsData.length; i++) { // Recreate the food blobs on the server-side and store in the foods array
+        let foodBlob = new Blob(i, foodsData[i].x, foodsData[i].y, foodsData[i].r, foodsData[i].colourR, foodsData[i].colourG, foodsData[i].colourB);
+        foods.push(foodBlob);
+      }
     });
+
+
+
+
+
+
 
 
     // Synchronize the position and size of the blob between the server and the connected clients

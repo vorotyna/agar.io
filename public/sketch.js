@@ -5,7 +5,8 @@ let blob;
 let id;
 
 let blobs = []; // Holds an array of different blobs
-let food = []; // Holds an array of food
+let foods = []; // Holds an array of food blobs
+let foodsData = []; // Holds an array of food blob data
 let zoom = 1;
 
 
@@ -21,13 +22,6 @@ let zoom = 1;
 function setup() {
   createCanvas(windowWidth, windowHeight); // Setup canvas size
 
-  // Create a loop where food blobs are created into the food array
-  for (let i = 0; i <= 250; i++) {
-    let x = random(-width, width); // Generate random x value that can be positioned within the canvas area or outside of it
-    let y = random(-height, height); // Generate random y value that can be positioned within the canvas area or outside of it
-    food[i] = new Blob(x, y, 8, random(200, 255), random(100, 255), random(200, 255)); // Creates new food blobs in food array with random height, random width, radius of 16, and RGB of 55,0,0
-  }
-
   // Start a socket connection to the server
   socket = io.connect('http://localhost:3000');
 
@@ -42,7 +36,26 @@ function setup() {
     colourB: blob.colourB
   };
 
-  socket.emit('start', data);
+  // Create a loop where 250 food blobs are created into the foods array
+  for (let i = 0; i < 250; i++) {
+    let x = random(-width, width); // Generate random x value that can be positioned within the canvas area or outside of it
+    let y = random(-height, height); // Generate random y value that can be positioned within the canvas area or outside of it
+    let food = new Blob(x, y, 8, random(200, 255), random(100, 255), random(200, 255)); // Creates new food blobs in food array with random height, random width, radius of 16, and RGB of 55,0,0
+
+    let foodData = {
+      x: food.pos.x,
+      y: food.pos.y,
+      r: food.r,
+      colourR: food.colourR,
+      colourG: food.colourG,
+      colourB: food.colourB
+    };
+
+    foods.push(food);
+    foodsData.push(foodData);
+  }
+
+  socket.emit('start', data, foodsData);
 
   // On the 'heartbeat' event, console log to the client (frontend)
   socket.on('heartbeat',
@@ -104,18 +117,18 @@ function draw() {
 
 
   // Loop through all the food blobs
-  for (let i = 0; i < food.length; i++) {
+  for (let i = 0; i < foods.length; i++) {
     // Show the food blobs on the map
-    food[i].show();
+    foods[i].show();
 
     // If Blob eats one of the food blobs, then remove one food blob from food array and Blob grows
-    if (blob.eats(food[i])) {
-      food.splice(i, 1); // Remove one element starting at index i 
+    if (blob.eats(foods[i])) {
+      foods.splice(i, 1); // Remove one element starting at index i 
 
       // Replace with a new food blob
       let x = random(-width, width); // Generate random x value that can be positioned within the canvas area or outside of it
       let y = random(-height, height); // Generate random y value that can be positioned within the canvas area or outside of it
-      food.push(new Blob(x, y, 8, random(200, 255), random(100, 255), random(200, 255))); // Creates new food blobs in food array with random height, random width, radius of 16, and random RGB
+      foods.push(new Blob(x, y, 8, random(200, 255), random(100, 255), random(200, 255))); // Creates new food blobs in food array with random height, random width, radius of 16, and random RGB
     }
   }
 
