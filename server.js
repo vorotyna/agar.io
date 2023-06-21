@@ -38,7 +38,7 @@ let io = require('socket.io')(server);
 // Have the server send a message (through the heartbeat function) to the client every second (1000ms)
 setInterval(heartbeat, 1000);
 function heartbeat() {
-  io.sockets.emit('heartbeat', blobs); // Send a heartbeat event to all connected clients, contained in the 'blobs' array
+  io.sockets.emit('heartbeat', blobs, foods); // Send a heartbeat event to all connected clients, contained in the 'blobs' array
 }
 
 
@@ -67,7 +67,12 @@ io.sockets.on(
       let blob = new Blob(socket.id, data.x, data.y, data.r, data.colourR, data.colourG, data.colourB); // Recreate main player blob on the server side
       blobs.push(blob); // Push this new blob into our list of blobs / clients
 
+
       for (let i = 0; i < foodsData.length; i++) { // Recreate the food blobs on the server-side and store in the foods array
+        if (foods.length >= 250) {
+          break;
+        }
+
         let foodBlob = new Blob(i, foodsData[i].x, foodsData[i].y, foodsData[i].r, foodsData[i].colourR, foodsData[i].colourG, foodsData[i].colourB);
         foods.push(foodBlob);
       }
@@ -80,15 +85,20 @@ io.sockets.on(
 
 
 
+
+
+
     // Synchronize the position and size of the blob between the server and the connected clients
-    socket.on('update', function(data) {
+    socket.on('updateBlob', function(dataBlob) {
       let blob = blobs.find(blob => blob.id === socket.id); // Find the blob object in the blobs array based on the socket id
       if (blob) {
-        blob.x = data.x;
-        blob.y = data.y;
-        blob.r = data.r;
+        blob.x = dataBlob.x;
+        blob.y = dataBlob.y;
+        blob.r = dataBlob.r;
       }
-      console.log(`UPDATED: ${socket.id} ${data.x} ${data.y} ${data.r}`);
+      console.log(
+        `UPDATED: ${socket.id} ${dataBlob.x} ${dataBlob.y} ${dataBlob.r}`
+      );
     });
 
 
@@ -97,6 +107,18 @@ io.sockets.on(
 
 
 
+
+
+
+
+
+
+    socket.on('updateFood', function(dataFood) {
+      if (foods.length !== 0 || dataFood.length !== 0) {
+        foods = [...dataFood];
+      }
+      console.log("updated food");
+    });
 
     // On disconnect, we want to remove the user's blob from the blobs array
     socket.on('disconnect', function() {

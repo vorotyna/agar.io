@@ -7,6 +7,7 @@ let id;
 let blobs = []; // Holds an array of different blobs
 let foods = []; // Holds an array of food blobs
 let foodsData = []; // Holds an array of food blob data
+let serverFoods = [];
 let zoom = 1;
 
 
@@ -59,9 +60,10 @@ function setup() {
 
   // On the 'heartbeat' event, console log to the client (frontend)
   socket.on('heartbeat',
-    function(data) {
-      console.log(data);
-      blobs = data;
+    function(dataBlobs, dataFoods) {
+      console.log('DATA BLOBS', dataBlobs, 'DATA FOODS', dataFoods);
+      blobs = dataBlobs;
+      serverFoods = dataFoods;
     }
   );
 }
@@ -117,18 +119,44 @@ function draw() {
 
 
   // Loop through all the food blobs
-  for (let i = 0; i < foods.length; i++) {
+  for (let i = 0; i < serverFoods.length; i++) {
     // Show the food blobs on the map
-    foods[i].show();
+    fill(
+      serverFoods[i].colourR,
+      serverFoods[i].colourG,
+      serverFoods[i].colourR
+    ); // Sets the fill color
+    ellipse(
+      serverFoods[i].x,
+      serverFoods[i].y,
+      serverFoods[i].r * 2,
+      serverFoods[i].r * 2
+    ); // Size of the ellipse
+    serverFoods[i].pos = createVector(serverFoods[i].x, serverFoods[i].y);
 
     // If Blob eats one of the food blobs, then remove one food blob from food array and Blob grows
-    if (blob.eats(foods[i])) {
-      foods.splice(i, 1); // Remove one element starting at index i 
-
+    if (blob.eats(serverFoods[i])) {
+      serverFoods.splice(i, 1); // Remove one element starting at index i
+      foods.splice(i, 1);
       // Replace with a new food blob
       let x = random(-width, width); // Generate random x value that can be positioned within the canvas area or outside of it
       let y = random(-height, height); // Generate random y value that can be positioned within the canvas area or outside of it
-      foods.push(new Blob(x, y, 8, random(200, 255), random(100, 255), random(200, 255))); // Creates new food blobs in food array with random height, random width, radius of 16, and random RGB
+      let newF = new Blob(x, y, 8, random(200, 255), random(100, 255), random(200, 255));
+      let newFServerBlobType = {
+        id: random(250, 1000000),
+        x: newF.x,
+        y: newF.y,
+        r: newF.r,
+        colourR: newF.colourR,
+        colourG: newF.colourG,
+        colourB: newF.colourB,
+      };
+      foods.push(
+        newF
+      );
+      serverFoods.push({
+        newFServerBlobType
+      }); // Creates new food blobs in food array with random height, random width, radius of 16, and random RGB
     }
   }
 
@@ -145,10 +173,15 @@ function draw() {
     y: blob.pos.y,
     r: blob.r,
   };
-  socket.emit('update', data);
+
+  socket.emit('updateBlob', data);
+
+
+  if (serverFoods.length > 0) {
+    socket.emit("updateFood", serverFoods);
+  };
+
 }
-
-
 
 
 
