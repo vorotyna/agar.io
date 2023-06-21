@@ -1,4 +1,5 @@
 let blobs = []; // All of the blobs/clients that are currently connected
+let foods = []; // All of the food blobs that should be on the map
 
 // Constructor function 
 function Blob(id, x, y, r, colourR, colourG, colourB) {
@@ -57,7 +58,7 @@ io.sockets.on(
 
     socket.on('start', function(data) {
       console.log(`STARTING: ${socket.id} ${data.x} ${data.y} ${data.r}`);
-      let blob = new Blob(socket.id, data.x, data.y, data.r, data.colourR, data.colourB, data.colourG); // Create a blob when we have a new client
+      let blob = new Blob(socket.id, data.x, data.y, data.r, data.colourR, data.colourG, data.colourB); // Create a blob when we have a new client
       blobs.push(blob); // Push this new blob into our list of blobs / clients
     });
 
@@ -82,7 +83,7 @@ io.sockets.on(
 
     // On disconnect, we want to remove the user's blob from the blobs array
     socket.on('disconnect', function() {
-      console.log('Client has disconnected');
+      console.log(`Client ${socket.id} has disconnected`);
 
       let index = blobs.findIndex(blob => blob.id === socket.id); // Find the index of the blob object in the blobs array based on the socket id
       if (index !== -1) {

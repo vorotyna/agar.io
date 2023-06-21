@@ -91,7 +91,7 @@ function draw() {
     // If it is not the Client's own blob, then draw blob
     if (id.substring(2, id.length) !== socket.id) {
       // Blob styling
-      fill(blobs[i].a, blobs[i].b, blobs[i].c); // Colour blob accodringly
+      fill(blobs[i].colourR, blobs[i].colourG, blobs[i].colourB); // Colour blob accordingly
       ellipse(blobs[i].x, blobs[i].y, blobs[i].r * 2, blobs[i].r * 2);
 
       // Text styling
