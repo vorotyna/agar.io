@@ -1,13 +1,12 @@
-// Keep track of our socket information
-let socket;
+let socket; // Keep track of our socket information
 
 let blob;
 let id;
 
-let blobs = []; // Holds an array of different blobs
-let foods = []; // Holds an array of food blobs
-let foodsData = []; // Holds an array of food blob data
-let serverFoods = [];
+let foods = []; // Holds an array of food Blob constructors
+let foodsData = []; // Holds an array of food blob data that is sent to the server
+let serverFoods = []; // Holds an array of food blob data that is returned from the server
+let blobs = []; // Holds an array of different player blobs that are returned from the server
 let zoom = 1;
 
 
@@ -19,6 +18,7 @@ let zoom = 1;
 
 
 
+// ----- SETUP FUNCTION ----- //
 
 function setup() {
   createCanvas(windowWidth, windowHeight); // Setup canvas size
@@ -26,8 +26,10 @@ function setup() {
   // Start a socket connection to the server
   socket = io.connect('http://localhost:3000');
 
-  blob = new Blob(0, 0, 16, random(100, 255), random(100, 255), random(100, 255)); // Make our Blob // CHANGE FROM 0,0 TO RANDOM(HEIGHT), RANDOM(WIDTH)
-  // Make an object with the Blob's data
+  // Make our main player Blob *CHANGE FROM 0,0 TO RANDOM(HEIGHT), RANDOM(WIDTH)*
+  blob = new Blob(0, 0, 16, random(100, 255), random(100, 255), random(100, 255));
+
+  // Make an object with the main player blob's data to send to the server
   let data = {
     x: blob.pos.x,
     y: blob.pos.y,
@@ -41,8 +43,9 @@ function setup() {
   for (let i = 0; i < 250; i++) {
     let x = random(-width, width); // Generate random x value that can be positioned within the canvas area or outside of it
     let y = random(-height, height); // Generate random y value that can be positioned within the canvas area or outside of it
-    let food = new Blob(x, y, 8, random(200, 255), random(100, 255), random(200, 255)); // Creates new food blobs in food array with random height, random width, radius of 16, and RGB of 55,0,0
+    let food = new Blob(x, y, 4, random(200, 255), random(100, 255), random(200, 255)); // Create new food blob with random height, random width, radius of 4, and random RGB
 
+    // Make an object with the food blob's data to send to the server
     let foodData = {
       x: food.pos.x,
       y: food.pos.y,
@@ -52,18 +55,18 @@ function setup() {
       colourB: food.colourB
     };
 
-    foods.push(food);
-    foodsData.push(foodData);
+    foods.push(food); // Push each food Blob constructor into the foods array
+    foodsData.push(foodData); // Push each food Blob's foodData object into the foodsData array, to be sent to the server
   }
 
-  socket.emit('start', data, foodsData);
+  socket.emit('start', data, foodsData); // On 'start' event, send data object and foodsData array (of foodData objects) to the server
 
-  // On the 'heartbeat' event, console log to the client (frontend)
+  // On the 'heartbeat' event (each 1000ms), execute the following function
   socket.on('heartbeat',
-    function(dataBlobs, dataFoods) {
-      console.log('DATA BLOBS', dataBlobs, 'DATA FOODS', dataFoods);
-      blobs = dataBlobs;
-      serverFoods = dataFoods;
+    function(dataBlobs, dataFoods) { // Receives dataBlobs and dataFoods parameters from the server
+      console.log('DATA BLOBS', dataBlobs, 'DATA FOODS', dataFoods); // Console.logs both parameters
+      blobs = dataBlobs; // Assign blobs array to the dataBlobs parameter that is returned from the server-side
+      serverFoods = dataFoods; // Assign serverFoods array to the dataFoods parameter that is returned from the server-side
     }
   );
 }
@@ -76,7 +79,7 @@ function setup() {
 
 
 
-
+// ----- DRAW FUNCTION ----- //
 
 function draw() {
   background(255); // Sets background colour to white
