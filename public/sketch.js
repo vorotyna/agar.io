@@ -40,7 +40,7 @@ function setup() {
   };
 
   // Create a loop where 250 food blobs are created into the foods array
-  for (let i = 0; i < 250; i++) {
+  for (let i = 0; i < 500; i++) {
     let x = random(-width, width); // Generate random x value that can be positioned within the canvas area or outside of it
     let y = random(-height, height); // Generate random y value that can be positioned within the canvas area or outside of it
     let food = new Blob(x, y, 4, random(200, 255), random(100, 255), random(200, 255)); // Create new food blob with random height, random width, radius of 4, and random RGB
@@ -93,16 +93,16 @@ function draw() {
   // Draw grid lines in the background
   let gridSize = 25; // Size of each grid cell
   stroke(225); // Color of grid lines
-  strokeWeight(0.5);
-  for (let x = -width - 1000; x < width + 1000; x += gridSize) {
+  strokeWeight(0.5); // Boldness of strokes
+  for (let x = -width - 1000; x < width + 1000; x += gridSize) { // Create vertical grid lines that exceed the limits of the canvas area (±1000) 
     line(x, -height - 1000, x, height + 1000); // Vertical lines
   }
-  for (let y = -height - 1000; y < height + 1000; y += gridSize) {
+  for (let y = -height - 1000; y < height + 1000; y += gridSize) { // Create horizontal grid lines that exceed the limits of the canvas area (±1000) 
     line(-width - 1000, y, width + 1000, y); // Horizontal lines
   }
 
 
-  // Loop through all the players 
+  // Loop through all the players that are returned from the server
   for (let i = blobs.length - 1; i >= 0; i--) {
     let id = blobs[i].id;
 
@@ -110,24 +110,25 @@ function draw() {
     if (id.substring(2, id.length) !== socket.id) {
       // Blob styling
       fill(blobs[i].colourR, blobs[i].colourG, blobs[i].colourB); // Colour blob accordingly
-      ellipse(blobs[i].x, blobs[i].y, blobs[i].r * 2, blobs[i].r * 2);
+      ellipse(blobs[i].x, blobs[i].y, blobs[i].r * 2, blobs[i].r * 2); // Size blob accordingly
 
-      // Text styling
-      fill(255); // Colour white
-      textAlign(CENTER);
-      textSize(4);
-      text(blobs[i].id, blobs[i].x, blobs[i].y + blobs[i].r);
+      // Text styling for their id tag
+      fill(0); // Colour white
+      textAlign(CENTER); // Align Id tag in the center
+      textSize(5);
+      text(blobs[i].id.substring(2, 9), blobs[i].x, blobs[i].y + blobs[i].r); // Print Id tag that is a substring from index 2 to 9 
     }
   }
 
 
-  // Loop through all the food blobs
+  // Loop through all the food blobs that returned from the server
   for (let i = 0; i < serverFoods.length; i++) {
+    serverFoods[i].pos = createVector(serverFoods[i].x, serverFoods[i].y); // Create a position vector since serverFoods are not the same constructors as blobs.js 
     // Show the food blobs on the map
     fill(
       serverFoods[i].colourR,
       serverFoods[i].colourG,
-      serverFoods[i].colourR
+      serverFoods[i].colourB
     ); // Sets the fill color
     ellipse(
       serverFoods[i].x,
@@ -135,55 +136,56 @@ function draw() {
       serverFoods[i].r * 2,
       serverFoods[i].r * 2
     ); // Size of the ellipse
-    serverFoods[i].pos = createVector(serverFoods[i].x, serverFoods[i].y);
 
-    // If Blob eats one of the food blobs, then remove one food blob from food array and Blob grows
+    // If main player Blob eats one of the food blobs, then remove one food blob from serverFoods array and main player Blob grows
     if (blob.eats(serverFoods[i])) {
       serverFoods.splice(i, 1); // Remove one element starting at index i
-      foods.splice(i, 1);
+      foods.splice(i, 1); // Remove one constructor food blob from foods array at index i
+
       // Replace with a new food blob
       let x = random(-width, width); // Generate random x value that can be positioned within the canvas area or outside of it
       let y = random(-height, height); // Generate random y value that can be positioned within the canvas area or outside of it
-      let newF = new Blob(x, y, 8, random(200, 255), random(100, 255), random(200, 255));
-      let newFServerBlobType = {
-        id: random(250, 1000000),
-        x: newF.x,
-        y: newF.y,
-        r: newF.r,
-        colourR: newF.colourR,
-        colourG: newF.colourG,
-        colourB: newF.colourB,
+
+      let newFood = new Blob(x, y, 4, random(200, 255), random(100, 255), random(200, 255));
+
+      let newFoodServerBlobType = {
+        id: random(250, 1000),
+        x: newFood.pos.x,
+        y: newFood.pos.y,
+        r: newFood.r,
+        colourR: newFood.colourR,
+        colourG: newFood.colourG,
+        colourB: newFood.colourB,
       };
-      foods.push(
-        newF
-      );
-      serverFoods.push({
-        newFServerBlobType
-      }); // Creates new food blobs in food array with random height, random width, radius of 16, and random RGB
+
+      foods.push(newFood); // Push newFood consturctor to foods array on frontend
+
+      serverFoods.push(newFoodServerBlobType); // Push newFoodServerBlobType to serverFoods arrays on server-side
     }
   }
 
-
-  blob.show(); // Show the main player blob
+  // Show the main player blob
+  blob.show();
   if (mouseIsPressed) {
     blob.update(); // Update blob position when mouse moves
   }
   blob.constrain();
 
-  // Update location continuously in draw()
+  // Update main player blob location continuously in draw()
   let data = {
     x: blob.pos.x,
     y: blob.pos.y,
     r: blob.r,
   };
 
+  // Send an 'updateBlob' event with data parameter to the server-side
   socket.emit('updateBlob', data);
 
 
+  // If serverFoods length is more than 0, send an 'updateFoob' event with serverFoods parameter to the server-side
   if (serverFoods.length > 0) {
     socket.emit("updateFood", serverFoods);
   };
-
 }
 
 
@@ -192,7 +194,8 @@ function draw() {
 
 
 
-// Resize the canvas if someone changes the window size
+
+// ----- WINDOW RESIZE FUNCTION ----- //
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
 }

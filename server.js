@@ -67,9 +67,9 @@ io.sockets.on(
       let blob = new Blob(socket.id, data.x, data.y, data.r, data.colourR, data.colourG, data.colourB); // Recreate main player blob on the server side
       blobs.push(blob); // Push this new blob into our list of blobs / clients
 
-
-      for (let i = 0; i < foodsData.length; i++) { // Recreate the food blobs on the server-side and store in the foods array
-        if (foods.length >= 250) {
+      // Recreate the food blobs on the server-side and store in the foods array
+      for (let i = 0; i < foodsData.length; i++) {
+        if (foods.length >= 500) {
           break;
         }
 
@@ -112,13 +112,23 @@ io.sockets.on(
 
 
 
-
     socket.on('updateFood', function(dataFood) {
       if (foods.length !== 0 || dataFood.length !== 0) {
         foods = [...dataFood];
       }
       console.log("updated food");
     });
+
+
+
+
+
+
+
+
+
+
+
 
     // On disconnect, we want to remove the user's blob from the blobs array
     socket.on('disconnect', function() {
