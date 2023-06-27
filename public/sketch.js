@@ -1,12 +1,13 @@
 let socket; // Keep track of our socket information
 
-let blob;
+let blob; // Main player (CONSTRUCTOR)
 let id;
 
 let foods = []; // Holds an array of food Blob constructors
+let blobs = []; // Holds an array of client Blob constructors
 let foodsData = []; // Holds an array of food blob data that is sent to the server
 let serverFoods = []; // Holds an array of food blob data that is returned from the server
-let blobs = []; // Holds an array of different player blobs that are returned from the server
+let serverBlobs = []; // Holds an array of different player blobs that are returned from the server
 let zoom = 1;
 
 
@@ -31,6 +32,7 @@ function setup() {
 
   // Make an object with the main player blob's data to send to the server
   let data = {
+    id: blob.id,
     x: blob.pos.x,
     y: blob.pos.y,
     r: blob.r,
@@ -64,8 +66,7 @@ function setup() {
   // On the 'heartbeat' event (each 1000ms), execute the following function
   socket.on('heartbeat',
     function(dataBlobs, dataFoods) { // Receives dataBlobs and dataFoods parameters from the server
-      console.log('DATA BLOBS', dataBlobs, 'DATA FOODS', dataFoods); // Console.logs both parameters
-      blobs = dataBlobs; // Assign blobs array to the dataBlobs parameter that is returned from the server-side
+      serverBlobs = dataBlobs; // Assign serverBlobs array to the dataBlobs parameter that is returned from the server-side
       serverFoods = dataFoods; // Assign serverFoods array to the dataFoods parameter that is returned from the server-side
     }
   );
@@ -103,20 +104,20 @@ function draw() {
 
 
   // Loop through all the players that are returned from the server
-  for (let i = blobs.length - 1; i >= 0; i--) {
-    let id = blobs[i].id;
+  for (let i = serverBlobs.length - 1; i >= 0; i--) {
+    let id = serverBlobs[i].id;
 
     // If it is not the Client's own blob, then draw blob
     if (id.substring(2, id.length) !== socket.id) {
       // Blob styling
-      fill(blobs[i].colourR, blobs[i].colourG, blobs[i].colourB); // Colour blob accordingly
-      ellipse(blobs[i].x, blobs[i].y, blobs[i].r * 2, blobs[i].r * 2); // Size blob accordingly
+      fill(serverBlobs[i].colourR, serverBlobs[i].colourG, serverBlobs[i].colourB); // Colour blob accordingly
+      ellipse(serverBlobs[i].x, serverBlobs[i].y, serverBlobs[i].r * 2, serverBlobs[i].r * 2); // Size blob accordingly
 
       // Text styling for their id tag
       fill(0); // Colour white
       textAlign(CENTER); // Align Id tag in the center
       textSize(5);
-      text(blobs[i].id.substring(2, 9), blobs[i].x, blobs[i].y + blobs[i].r); // Print Id tag that is a substring from index 2 to 9 
+      text(serverBlobs[i].id.substring(2, 9), serverBlobs[i].x, serverBlobs[i].y + serverBlobs[i].r); // Print Id tag that is a substring from index 2 to 9 
     }
   }
 

@@ -66,6 +66,7 @@ io.sockets.on(
 
       let blob = new Blob(socket.id, data.x, data.y, data.r, data.colourR, data.colourG, data.colourB); // Recreate main player blob on the server side
       blobs.push(blob); // Push this new blob into our list of blobs / clients
+      console.log(blob);
 
       // Recreate the food blobs on the server-side and store in the foods array
       for (let i = 0; i < foodsData.length; i++) {
