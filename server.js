@@ -66,7 +66,6 @@ io.sockets.on(
 
       let blob = new Blob(socket.id, data.x, data.y, data.r, data.colourR, data.colourG, data.colourB); // Recreate main player blob on the server side
       blobs.push(blob); // Push this new blob into our list of blobs / clients
-      console.log(blob);
 
       // Recreate the food blobs on the server-side and store in the foods array
       for (let i = 0; i < foodsData.length; i++) {
@@ -92,14 +91,15 @@ io.sockets.on(
     // Synchronize the position and size of the blob between the server and the connected clients
     socket.on('updateBlob', function(dataBlob) {
       let blob = blobs.find(blob => blob.id === socket.id); // Find the blob object in the blobs array based on the socket id
-      if (blob) {
+
+      if (blob && (blob.x !== dataBlob.x || blob.y !== dataBlob.y || blob.r !== dataBlob.r)) {
         blob.x = dataBlob.x;
         blob.y = dataBlob.y;
         blob.r = dataBlob.r;
+        console.log(
+          `UPDATED: ${socket.id} ${dataBlob.x} ${dataBlob.y} ${dataBlob.r}`
+        );
       }
-      console.log(
-        `UPDATED: ${socket.id} ${dataBlob.x} ${dataBlob.y} ${dataBlob.r}`
-      );
     });
 
 
@@ -112,12 +112,14 @@ io.sockets.on(
 
 
 
-
     socket.on('updateFood', function(dataFood) {
-      if (foods.length !== 0 || dataFood.length !== 0) {
+      const foodString = JSON.stringify(foods);
+      const dataFoodString = JSON.stringify(dataFood);
+
+      if (foodString !== dataFoodString) {
         foods = [...dataFood];
+        console.log("Updated food");
       }
-      console.log("updated food");
     });
 
 
