@@ -40,7 +40,7 @@ function setup() {
   };
 
   // Create a loop where 250 food blobs are created into the foods array
-  for (let i = 0; i < 500; i++) {
+  for (let i = 0; i < 250; i++) {
     let x = random(-width, width); // Generate random x value that can be positioned within the canvas area or outside of it
     let y = random(-height, height); // Generate random y value that can be positioned within the canvas area or outside of it
     let food = new Blob(x, y, 4, random(200, 255), random(100, 255), random(200, 255)); // Create new food blob with random height, random width, radius of 4, and random RGB
