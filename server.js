@@ -35,8 +35,8 @@ app.use(express.static('public'));
 // WebSockets work with the HTTP server
 let io = require('socket.io')(server);
 
-// Have the server send a message (through the heartbeat function) to the client every second (1000ms)
-setInterval(heartbeat, 1000);
+// Have the server send a message (through the heartbeat function) to the client every second (30ms)
+setInterval(heartbeat, 30);
 function heartbeat() {
   io.sockets.emit('heartbeat', blobs, foods); // Send a heartbeat event to all connected clients, contained in the 'blobs' array
 }
@@ -124,6 +124,24 @@ io.sockets.on(
 
 
 
+
+
+
+
+
+    socket.on('blobEaten', function(eatenBlobId) {
+      const eatenBlobIndex = blobs.findIndex(blob => blob.id === eatenBlobId);
+
+      if (eatenBlobIndex !== -1) {
+        blobs.splice(eatenBlobIndex, 1);
+
+        if (eatenBlobId === socket.id) {
+          console.log('You have been eaten! Refresh the page for a new game.');
+        } else {
+          console.log(`Player ${eatenBlobId} was eaten by ${socket.id}`);
+        }
+      }
+    });
 
 
 

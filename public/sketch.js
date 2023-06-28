@@ -28,7 +28,7 @@ function setup() {
   socket = io.connect('http://localhost:3000');
 
   // Make our main player Blob *CHANGE FROM 0,0 TO RANDOM(HEIGHT), RANDOM(WIDTH)*
-  blob = new Blob(0, 0, 16, random(100, 255), random(100, 255), random(100, 255));
+  blob = new Blob(random(0, 500), 0, 16, random(100, 255), random(100, 255), random(100, 255));
 
   // Make an object with the main player blob's data to send to the server
   let data = {
@@ -102,44 +102,56 @@ function draw() {
     line(-width - 1000, y, width + 1000, y); // Horizontal lines
   }
 
-
-  // Loop through all the players that are returned from the server
+  // Loop through all the players that are returned from the server and create constructors for them to be used on frontend
   for (let i = serverBlobs.length - 1; i >= 0; i--) {
-    let id = serverBlobs[i].id;
+    let blob = new Blob(serverBlobs[i].x, serverBlobs[i].y, serverBlobs[i].r, serverBlobs[i].colourR, serverBlobs[i].colourG, serverBlobs[i].colourB); // Create new food blob with random height, random width, radius of 4, and random RGB
+    blob.id = serverBlobs[i].id;
+    blobs.push(blob);
+  }
+
+
+  // Loop through all the players that are returned from the server and handle blob eating scenarios
+  for (let i = blobs.length - 1; i >= 0; i--) {
+    let id = blobs[i].id;
 
     // If it is not the Client's own blob, then draw blob
     if (id.substring(2, id.length) !== socket.id) {
       // Blob styling
-      fill(serverBlobs[i].colourR, serverBlobs[i].colourG, serverBlobs[i].colourB); // Colour blob accordingly
-      ellipse(serverBlobs[i].x, serverBlobs[i].y, serverBlobs[i].r * 2, serverBlobs[i].r * 2); // Size blob accordingly
+      fill(blobs[i].colourR, blobs[i].colourG, blobs[i].colourB); // Colour blob accordingly
+      ellipse(blobs[i].x, blobs[i].y, blobs[i].r * 2, blobs[i].r * 2); // Size blob accordingly
 
       // Text styling for their id tag
       fill(0); // Colour white
       textAlign(CENTER); // Align Id tag in the center
       textSize(5);
-      text(serverBlobs[i].id.substring(2, 9), serverBlobs[i].x, serverBlobs[i].y + serverBlobs[i].r); // Print Id tag that is a substring from index 2 to 9 
+      text(blobs[i].id.substring(2, 9), blobs[i].x, blobs[i].y + blobs[i].r); // Print Id tag that is a substring from index 2 to 9 
+
+      if (blob.eats(blobs[i])) {
+        blobs.splice(i, 1);
+        serverBlobs.splice(i, 1);
+        socket.emit("blobEaten", serverBlobs);
+      }
     }
   }
 
 
   // Loop through all the food blobs that returned from the server
-  for (let i = 0; i < serverFoods.length; i++) {
-    serverFoods[i].pos = createVector(serverFoods[i].x, serverFoods[i].y); // Create a position vector since serverFoods are not the same constructors as blobs.js 
+  for (let i = 0; i < foods.length; i++) {
     // Show the food blobs on the map
     fill(
-      serverFoods[i].colourR,
-      serverFoods[i].colourG,
-      serverFoods[i].colourB
+      foods[i].colourR,
+      foods[i].colourG,
+      foods[i].colourB
     ); // Sets the fill color
     ellipse(
-      serverFoods[i].x,
-      serverFoods[i].y,
-      serverFoods[i].r * 2,
-      serverFoods[i].r * 2
+      foods[i].pos.x,
+      foods[i].pos.y,
+      foods[i].r * 2,
+      foods[i].r * 2
     ); // Size of the ellipse
 
     // If main player Blob eats one of the food blobs, then remove one food blob from serverFoods array and main player Blob grows
-    if (blob.eats(serverFoods[i])) {
+    if (blob.eats(foods[i])) {
       serverFoods.splice(i, 1); // Remove one element starting at index i
       foods.splice(i, 1); // Remove one constructor food blob from foods array at index i
 
@@ -165,6 +177,8 @@ function draw() {
     }
   }
 
+  socket.emit("updateFood", serverFoods);
+
   // Show the main player blob
   blob.show();
   if (mouseIsPressed) {
@@ -181,12 +195,6 @@ function draw() {
 
   // Send an 'updateBlob' event with data parameter to the server-side
   socket.emit('updateBlob', data);
-
-
-  // If serverFoods length is more than 0, send an 'updateFoob' event with serverFoods parameter to the server-side
-  if (serverFoods.length > 0) {
-    socket.emit("updateFood", serverFoods);
-  };
 }
 
 
