@@ -96,9 +96,10 @@ io.sockets.on(
         blob.x = dataBlob.x;
         blob.y = dataBlob.y;
         blob.r = dataBlob.r;
-        console.log(
-          `UPDATED: ${socket.id} ${dataBlob.x} ${dataBlob.y} ${dataBlob.r}`
-        );
+        // console.log(
+        //   `UPDATED: ${socket.id} ${dataBlob.x} ${dataBlob.y} ${dataBlob.r}`
+        // );
+        // console.log("Blobs after update", blobs);
       }
     });
 
@@ -131,6 +132,7 @@ io.sockets.on(
 
     socket.on('blobEaten', function(eatenBlobId) {
       const eatenBlobIndex = blobs.findIndex(blob => blob.id === eatenBlobId);
+      console.log('HELLO EATEN');
 
       if (eatenBlobIndex !== -1) {
         blobs.splice(eatenBlobIndex, 1);
@@ -138,9 +140,15 @@ io.sockets.on(
         if (eatenBlobId === socket.id) {
           console.log('You have been eaten! Refresh the page for a new game.');
         } else {
-          console.log(`Player ${eatenBlobId} was eaten by ${socket.id}`);
+          const socketToDisconnect = io.sockets.connected[eatenBlobId];
+
+          console.log(`Player ${socket.id} just ate Player ${eatenBlobId}`);
+          socketToDisconnect.emit('showAlert', blobs);
+          socketToDisconnect.disconnect();
         }
       }
+
+
     });
 
 

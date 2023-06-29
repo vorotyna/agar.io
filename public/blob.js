@@ -7,7 +7,7 @@ function Blob(x, y, r, colourR, colourG, colourB) {
   this.colourR = colourR; // Fill colour for Blob
   this.colourG = colourG; // Fill colour for Blob
   this.colourB = colourB; // Fill colour for Blob
-
+  this.isVisible = true;
   // A method to update the position of the blob based on the mouse position
   this.update = function() {
     let newVel = createVector(mouseX - width / 2, mouseY - height / 2); // Represents the velocity of the Blob based on current mouse position
@@ -18,13 +18,19 @@ function Blob(x, y, r, colourR, colourG, colourB) {
 
   // A method handles the size of the Blob when it overlaps (i.e., 'eats') a small blob
   this.eats = function(other) {
-    let d = p5.Vector.dist(this.pos, other.pos); // Calculate distance between Blob and other blob
+    let d = p5.Vector.dist(this.pos, other.pos); // Calculate distance between Blob and other blob    
+
     if (d < this.r + other.r) { // If the distance is less than the radius of both Blobs added, means they are overlapping (i.e., being eaten by Blob)
-      let sum = PI * this.r * this.r + PI * other.r * other.r; // Sum of areas of both blobs (i.e., A = PI * r^2)
-      this.r = sqrt(sum / PI); // Solve for new radius of Blob based on the area previously calculated
-      return true;
-    } else {
-      return false;
+      // Check if this blob is larger (on top) and eats the other blob
+      let sizeDifference = this.r - other.r;
+
+      if (sizeDifference > 5) {
+        let sum = PI * this.r * this.r + PI * other.r * other.r; // Sum of areas of both blobs (i.e., A = PI * r^2)
+        this.r = sqrt(sum / PI); // Solve for new radius of Blob based on the area previously calculated
+        return true;
+      } else {
+        return false;
+      }
     }
   };
 
@@ -38,7 +44,16 @@ function Blob(x, y, r, colourR, colourG, colourB) {
 
   // A method of the Blob class responsible for diplaying the blob on the canvas
   this.show = function() {
-    fill(colourR, colourG, colourB); // Sets the fill color
-    ellipse(this.pos.x, this.pos.y, this.r * 2, this.r * 2); // Size of the ellipse
+    if (this.isVisible) {
+      fill(colourR, colourG, colourB); // Sets the fill color
+      ellipse(this.pos.x, this.pos.y, this.r * 2, this.r * 2); // Size of the ellipse
+    }
+  };
+
+
+
+  // A method of the Blob class responsible for hiding the blob on the canvas
+  this.hide = function() {
+    this.isVisible = false;
   };
 }
