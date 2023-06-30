@@ -20,6 +20,8 @@ function openNewWindow() {
 
 
 
+
+
 // ----- SETUP FUNCTION ----- //
 
 function setup() {
@@ -28,14 +30,14 @@ function setup() {
   // Start a socket connection to the server
   socket = io.connect("http://localhost:3000");
 
-  // Make our main player Blob *CHANGE FROM 0,0 TO RANDOM(HEIGHT), RANDOM(WIDTH)*
+  // Cretae our main player Blob constructor
   blob = new Blob(
-    random(width),
-    random(height),
-    16,
-    random(100, 255),
-    random(100, 255),
-    random(100, 255)
+    random(-width, width), // Random spawning location (x)
+    random(-height, height), // Random spawning location (y)
+    16, // Radius size
+    random(100, 255), // Random colour (R)
+    random(100, 255), // Random colour (G)
+    random(100, 255) // Random colour (B)
   );
 
   // Make an object with the main player blob's data to send to the server
@@ -75,15 +77,13 @@ function setup() {
     foodsData.push(foodData); // Push each food Blob's foodData object into the foodsData array, to be sent to the server
   }
 
-  socket.emit("start", data, foodsData); // On 'start' event, send data object and foodsData array (of foodData objects) to the server
+  socket.emit("start", data, foodsData); // On 'start' event, send data object with main player constructor and foodsData array (of foodData objects) to the server
 
-  // On the 'heartbeat' event (each 1000ms), execute the following function
+  // On the 'heartbeat' event (each 30ms), execute the following function
   socket.on("heartbeat", function(dataBlobs, dataFoods) {
     // Receives dataBlobs and dataFoods parameters from the server
     serverBlobs = dataBlobs; // Assign serverBlobs array to the dataBlobs parameter that is returned from the server-side
     serverFoods = dataFoods; // Assign serverFoods array to the dataFoods parameter that is returned from the server-side
-
-    console.log('SERVER BLOBS', serverBlobs);
   });
 }
 
@@ -99,6 +99,8 @@ function setup() {
 
 function draw() {
   background(255); // Sets background colour to white
+
+  // If blob.isVisible is true then allow blob to move around
   if (blob.isVisible) {
     translate(width / 2, height / 2); // Translates origin of the coordinate system to the center of the canvas
     let newzoom = 64 / blob.r; // Calculates the new zoom level based on the radius of the blob - the larger the radius, the smaller the zoom level
@@ -121,9 +123,8 @@ function draw() {
 
   // Loop through all the players that are returned from the server and handle blob eating scenarios
   for (let i = serverBlobs.length - 1; i >= 0; i--) {
-    let id = serverBlobs[i].id;
-    serverBlobs[i].pos = createVector(serverBlobs[i].x, serverBlobs[i].y);
-
+    id = serverBlobs[i].id; // Set ID
+    serverBlobs[i].pos = createVector(serverBlobs[i].x, serverBlobs[i].y); // Create position vector for serverBlob (so that it can be eaten with .eat method)
 
     // If it is not the Client's own blob, then draw blob
     if (id.substring(2, id.length) !== socket.id) {
@@ -132,30 +133,32 @@ function draw() {
       ellipse(serverBlobs[i].x, serverBlobs[i].y, serverBlobs[i].r * 2, serverBlobs[i].r * 2); // Size blob accordingly
 
       // Text styling for their id tag
-      fill(0); // Colour white
+      fill(0); // Colour black
       textAlign(CENTER); // Align Id tag in the center
       textSize(5);
       text(serverBlobs[i].id.substring(2, 9), serverBlobs[i].x, serverBlobs[i].y + serverBlobs[i].r); // Print Id tag that is a substring from index 2 to 9 
 
+      // Handle Blob (main player) eating a serverBlob (another player)
       if (blob.eats(serverBlobs[i])) {
-        // Remove the eaten blob from the arrays
+        // Remove the eaten blob from the serverBlobs array
         serverBlobs.splice(i, 1);
 
-        // Emit "blobEaten" event to inform other clients
+        // Emit 'blobEaten' event  to the server, to inform other clients
         socket.emit("blobEaten", id);
       }
     }
   }
 
+  // On 'showAlert' event from the server, update serverBlobs to be equal to blobs coming from the server
   socket.on('showAlert', function(blobs) {
     serverBlobs = blobs;
-    blob.isVisible = false;
+    blob.isVisible = false; // When player dies, do not show their blob on their screen anymore
   });
 
 
   // Loop through all the serverFoods food blobs that returned from the server
   for (let i = 0; i < serverFoods.length; i++) {
-    serverFoods[i].pos = createVector(serverFoods[i].x, serverFoods[i].y);
+    serverFoods[i].pos = createVector(serverFoods[i].x, serverFoods[i].y); // Create a position vector for serverFoods so they can interact with .eat method
 
     // Show the food blobs on the map
     fill(
@@ -169,7 +172,7 @@ function draw() {
       serverFoods[i].r * 2,
     ); // Size of the ellipse
 
-    // If main player Blob eats one of the food blobs, then remove one food blob from serverFoods array and main player Blob grows
+    // If main player Blob eats one of the food blobs, then remove one food blob from serverFoods array
     if (blob.eats(serverFoods[i])) {
       serverFoods.splice(i, 1); // Remove one element starting at index i
       foods.splice(i, 1); // Remove one constructor food blob from foods array at index i
@@ -178,7 +181,7 @@ function draw() {
       let x = random(-width, width); // Generate random x value that can be positioned within the canvas area or outside of it
       let y = random(-height, height); // Generate random y value that can be positioned within the canvas area or outside of it
 
-      let newFood = new Blob(x, y, 4, random(200, 255), random(100, 255), random(200, 255));
+      let newFood = new Blob(x, y, 4, random(200, 255), random(100, 255), random(200, 255)); // Create newFood constructor to replace eaten food
 
       let newFoodServerBlobType = {
         id: random(250, 1000),
@@ -188,18 +191,18 @@ function draw() {
         colourR: newFood.colourR,
         colourG: newFood.colourG,
         colourB: newFood.colourB,
-      };
+      }; // Create newFood data object for the server-side
 
-      foods.push(newFood); // Push newFood consturctor to foods array on frontend
+      foods.push(newFood); // Push newFood constructor to foods array on frontend
 
-      serverFoods.push(newFoodServerBlobType); // Push newFoodServerBlobType to serverFoods arrays on server-side
+      serverFoods.push(newFoodServerBlobType); // Push newFoodServerBlobType data object to serverFoods arrays for the server-side
     }
   }
 
+  // As long as serverFoods length is > 0, send 'updateFood' event to server with serverFoods array
   if (serverFoods.length > 0) {
-    socket.emit("updateFood", serverFoods);
+    socket.emit('updateFood', serverFoods);
   };
-
 
   // Show the main player blob
   blob.show();
@@ -215,9 +218,7 @@ function draw() {
     y: blob.pos.y,
     r: blob.r,
   };
-
-  // Send an 'updateBlob' event with data parameter to the server-side
-  socket.emit('updateBlob', data);
+  socket.emit('updateBlob', data); // Send an 'updateBlob' event with blob's location data to the server-side
 }
 
 
@@ -227,7 +228,9 @@ function draw() {
 
 
 
+
 // ----- WINDOW RESIZE FUNCTION ----- //
+
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
 }
