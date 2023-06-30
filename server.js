@@ -1,7 +1,7 @@
-let blobs = []; // All of the blobs/clients that are currently connected
+let blobs = []; // All of the clients that are currently connected
 let foods = []; // All of the food blobs that should be on the map
 
-// Constructor function 
+// Blob constructor function on the server-side
 function Blob(id, x, y, r, colourR, colourG, colourB) {
   this.id = id;
   this.x = x;
@@ -35,10 +35,10 @@ app.use(express.static('public'));
 // WebSockets work with the HTTP server
 let io = require('socket.io')(server);
 
-// Have the server send a message (through the heartbeat function) to the client every second (30ms)
+// Server updates the frontend with the blobs and foods array every 30ms
 setInterval(heartbeat, 30);
 function heartbeat() {
-  io.sockets.emit('heartbeat', blobs, foods); // Send a heartbeat event to all connected clients, contained in the 'blobs' array
+  io.sockets.emit('heartbeat', blobs, foods); // Send a heartbeat event to all connected clients
 }
 
 
@@ -59,7 +59,7 @@ io.sockets.on(
 
 
 
-
+    // ----- 'START' EVENT ----- //
 
     socket.on('start', function(data, foodsData) {
       console.log(`STARTING: ${socket.id} ${data.x} ${data.y} ${data.r}`);
@@ -69,12 +69,14 @@ io.sockets.on(
 
       // Recreate the food blobs on the server-side and store in the foods array
       for (let i = 0; i < foodsData.length; i++) {
+        // If foods array already has 250 food blobs in it, stop creating more
         if (foods.length >= 250) {
           break;
         }
 
-        let foodBlob = new Blob(i, foodsData[i].x, foodsData[i].y, foodsData[i].r, foodsData[i].colourR, foodsData[i].colourG, foodsData[i].colourB);
-        foods.push(foodBlob);
+        let foodBlob = new Blob(i, foodsData[i].x, foodsData[i].y, foodsData[i].r, foodsData[i].colourR, foodsData[i].colourG, foodsData[i].colourB); // Create new food Blob using server-side constructor
+
+        foods.push(foodBlob); // Push foodBlob to server-side foods array
       }
     });
 
@@ -88,18 +90,16 @@ io.sockets.on(
 
 
 
-    // Synchronize the position and size of the blob between the server and the connected clients
+    // ----- 'UPDATE' EVENT ----- //
+
     socket.on('updateBlob', function(dataBlob) {
       let blob = blobs.find(blob => blob.id === socket.id); // Find the blob object in the blobs array based on the socket id
 
+      // If it blob exists AND it's position coordinates/size has changed, then update its data on server-side
       if (blob && (blob.x !== dataBlob.x || blob.y !== dataBlob.y || blob.r !== dataBlob.r)) {
         blob.x = dataBlob.x;
         blob.y = dataBlob.y;
         blob.r = dataBlob.r;
-        // console.log(
-        //   `UPDATED: ${socket.id} ${dataBlob.x} ${dataBlob.y} ${dataBlob.r}`
-        // );
-        // console.log("Blobs after update", blobs);
       }
     });
 
@@ -111,15 +111,15 @@ io.sockets.on(
 
 
 
-
+    // ----- 'UPDATEFOOD' EVENT ----- //
 
     socket.on('updateFood', function(dataFood) {
       const foodString = JSON.stringify(foods);
       const dataFoodString = JSON.stringify(dataFood);
 
+      // If server-side 'foods' and frontend 'dataFood' strings are not the same, then update server-side foods with latest dataFood
       if (foodString !== dataFoodString) {
         foods = [...dataFood];
-        console.log("Updated food");
       }
     });
 
@@ -129,26 +129,23 @@ io.sockets.on(
 
 
 
+    // ----- 'BLOBEATEN' EVENT ----- //
 
     socket.on('blobEaten', function(eatenBlobId) {
-      const eatenBlobIndex = blobs.findIndex(blob => blob.id === eatenBlobId);
-      console.log('HELLO EATEN');
+      const eatenBlobIndex = blobs.findIndex(blob => blob.id === eatenBlobId); // Find index of the eaten blob in the server-side blobs array
 
+      // If findIndex returns an index
       if (eatenBlobIndex !== -1) {
-        blobs.splice(eatenBlobIndex, 1);
+        blobs.splice(eatenBlobIndex, 1); // Splice the blob from the blobs array
 
-        if (eatenBlobId === socket.id) {
-          console.log('You have been eaten! Refresh the page for a new game.');
-        } else {
-          const socketToDisconnect = io.sockets.connected[eatenBlobId];
+        const socketToDisconnect = io.sockets.connected[eatenBlobId]; // Define the eaten blob's socket
 
-          console.log(`Player ${socket.id} just ate Player ${eatenBlobId}`);
-          socketToDisconnect.emit('showAlert', blobs);
-          socketToDisconnect.disconnect();
-        }
+        console.log(`Player ${socket.id} just ate Player ${eatenBlobId}`);
+
+        socketToDisconnect.emit('showAlert', blobs); // Emit 'showEvent' alert to frontend and pass through server-side blobs array
+
+        socketToDisconnect.disconnect(); // Disconnect the eaten blob's socket
       }
-
-
     });
 
 
@@ -158,14 +155,16 @@ io.sockets.on(
 
 
 
+    // ----- 'DISCONNECT' EVENT ----- //
 
-    // On disconnect, we want to remove the user's blob from the blobs array
     socket.on('disconnect', function() {
-      console.log(`Client ${socket.id} has disconnected`);
-
       let index = blobs.findIndex(blob => blob.id === socket.id); // Find the index of the blob object in the blobs array based on the socket id
+
+      // If findIndex returns the index
       if (index !== -1) {
         blobs.splice(index, 1); // Remove the blob from the blobs array
+
+        console.log(`Client ${socket.id} has disconnected`);
       }
     });
   });
