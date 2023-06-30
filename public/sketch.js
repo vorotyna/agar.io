@@ -18,10 +18,6 @@ function openNewWindow() {
 
 
 
-
-
-
-
 // ----- SETUP FUNCTION ----- //
 
 function setup() {
@@ -151,8 +147,11 @@ function draw() {
 
   // On 'showAlert' event from the server, update serverBlobs to be equal to blobs coming from the server
   socket.on('showAlert', function(blobs) {
-    serverBlobs = blobs;
+    serverBlobs = blobs; // Update serverBlobs array with latest server-side data
     blob.isVisible = false; // When player dies, do not show their blob on their screen anymore
+
+    const gameOverMenu = document.querySelector('.gameOverMenu'); // Find HTML element with specified class
+    gameOverMenu.style.visibility = 'visible'; // Add visibility value to it, so that it shows
   });
 
 
