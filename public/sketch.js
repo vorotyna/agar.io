@@ -210,7 +210,7 @@ function draw() {
   if (mouseIsPressed) {
     blob.update(); // Update blob position when mouse moves
   }
-  blob.constrain();
+  blob.constrain(); // Constrain blob movement to map size
 
   // Update main player blob location continuously in draw()
   let data = {

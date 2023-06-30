@@ -1,4 +1,5 @@
-// Constructor for creating instances of the Blob class
+// ----- CONSTRUCTOR FUNCTION FOR CREATING INSTANCES OF BLOB ----- //
+
 function Blob(x, y, r, colourR, colourG, colourB) {
   // A vector object stores an x and y component for a position on the screen, etc.
   this.pos = createVector(x, y); // Current position of Blob as a vector
@@ -7,7 +8,9 @@ function Blob(x, y, r, colourR, colourG, colourB) {
   this.colourR = colourR; // Fill colour for Blob
   this.colourG = colourG; // Fill colour for Blob
   this.colourB = colourB; // Fill colour for Blob
-  this.isVisible = true;
+  this.isVisible = true; // Blob is visible (true)
+
+
   // A method to update the position of the blob based on the mouse position
   this.update = function() {
     let newVel = createVector(mouseX - width / 2, mouseY - height / 2); // Represents the velocity of the Blob based on current mouse position
@@ -16,7 +19,8 @@ function Blob(x, y, r, colourR, colourG, colourB) {
     this.pos.add(this.vel); // Updates the position of Blob by adding velocity vector to the position vector
   };
 
-  // A method handles the size of the Blob when it overlaps (i.e., 'eats') a small blob
+
+  // A method handles the size of the Blob when it overlaps (i.e., 'eats') a smaller blob
   this.eats = function(other) {
     let d = p5.Vector.dist(this.pos, other.pos); // Calculate distance between Blob and other blob    
 
@@ -34,7 +38,8 @@ function Blob(x, y, r, colourR, colourG, colourB) {
     }
   };
 
-  // A method to contrain blob movement
+
+  // A method to contrain blob movement to the map size
   this.constrain = function() {
     blob.pos.x = constrain(blob.pos.x, -width, width);
     blob.pos.y = constrain(blob.pos.y, -height, height);
