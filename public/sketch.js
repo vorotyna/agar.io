@@ -1,9 +1,9 @@
 let socket; // Keep track of our socket information
 
-let blob; // Main player (CONSTRUCTOR)
+let blob; // Main player constructor
 let id;
 
-let foods = []; // Holds an array of food Blob constructors
+let foods = []; // Holds an array of food Blob constructors on client-side only
 let foodsData = []; // Holds an array of food blob data that is sent to the server
 let serverFoods = []; // Holds an array of food blob data that is returned from the server
 let serverBlobs = []; // Holds an array of different player blobs that are returned from the server
@@ -21,7 +21,7 @@ function openNewWindow() {
 // ----- SETUP FUNCTION ----- //
 
 function setup() {
-  createCanvas(windowWidth, windowHeight); // Setup canvas size
+  createCanvas(windowWidth, windowHeight); // Setup canvas size to size of browser tab
 
   // Start a socket connection to the server
   socket = io.connect("http://localhost:3000");
@@ -30,7 +30,7 @@ function setup() {
   blob = new Blob(
     random(-width, width), // Random spawning location (x)
     random(-height, height), // Random spawning location (y)
-    16, // Radius size
+    8, // Radius size
     random(100, 255), // Random colour (R)
     random(100, 255), // Random colour (G)
     random(100, 255) // Random colour (B)
@@ -48,11 +48,9 @@ function setup() {
 
   // Create a loop where 250 food blobs are created into the foods array
   for (let i = 0; i < 250; i++) {
-    let x = random(-width, width); // Generate random x value that can be positioned within the canvas area or outside of it
-    let y = random(-height, height); // Generate random y value that can be positioned within the canvas area or outside of it
     let food = new Blob(
-      x,
-      y,
+      random(-width, width), // Generate random x value that can be positioned within the canvas area or outside of it 
+      random(-height, height), // Generate random y value that can be positioned within the canvas area or outside of it
       4,
       random(200, 255),
       random(100, 255),
@@ -74,6 +72,9 @@ function setup() {
   }
 
   socket.emit("start", data, foodsData); // On 'start' event, send data object with main player constructor and foodsData array (of foodData objects) to the server
+
+
+
 
   // On the 'heartbeat' event (each 30ms), execute the following function
   socket.on("heartbeat", function(dataBlobs, dataFoods) {
@@ -99,9 +100,18 @@ function draw() {
   // If blob.isVisible is true then allow blob to move around
   if (blob.isVisible) {
     translate(width / 2, height / 2); // Translates origin of the coordinate system to the center of the canvas
-    let newzoom = 64 / blob.r; // Calculates the new zoom level based on the radius of the blob - the larger the radius, the smaller the zoom level
-    zoom = lerp(zoom, newzoom, 0.1); // Interpolates the current zoom level towards the new zoom level gradually
-    scale(zoom); // Scale coordinate system to increase the world view
+
+    // If blob radius is <= 42, zoom out. Otherwise, set to a constant zoom level
+    if (blob.r <= 42) {
+      let newzoom = 80 / blob.r; // Calculates the new zoom level based on the radius of the blob - the larger the radius, the smaller the zoom level
+      zoom = lerp(zoom, newzoom, 0.1); // Interpolates the current zoom level towards the new zoom level gradually
+      scale(zoom); // Scale coordinate system to increase the world view
+    } else {
+      let newzoom = 80 / 42; // Set a constant zoom level for anything over 42
+      zoom = lerp(zoom, newzoom, 0.1); // Interpolates the current zoom level towards the new zoom level gradually
+      scale(zoom);
+    }
+
     translate(-blob.pos.x, -blob.pos.y); // Translates the coordinate system to follow the position of the Blob - where world moves in the opposite direction of the Blob position (giving illusion that the world is moving relative to Blob)
   }
 
@@ -156,7 +166,7 @@ function draw() {
 
 
   // Loop through all the serverFoods food blobs that returned from the server
-  for (let i = 0; i < serverFoods.length; i++) {
+  for (let i = serverFoods.length - 1; i >= 0; i--) {
     serverFoods[i].pos = createVector(serverFoods[i].x, serverFoods[i].y); // Create a position vector for serverFoods so they can interact with .eat method
 
     // Show the food blobs on the map
@@ -177,10 +187,7 @@ function draw() {
       foods.splice(i, 1); // Remove one constructor food blob from foods array at index i
 
       // Replace with a new food blob
-      let x = random(-width, width); // Generate random x value that can be positioned within the canvas area or outside of it
-      let y = random(-height, height); // Generate random y value that can be positioned within the canvas area or outside of it
-
-      let newFood = new Blob(x, y, 4, random(200, 255), random(100, 255), random(200, 255)); // Create newFood constructor to replace eaten food
+      let newFood = new Blob(random(-width, width), random(-height, height), 4, random(200, 255), random(100, 255), random(200, 255)); // Create newFood constructor to replace eaten food
 
       let newFoodServerBlobType = {
         id: random(250, 1000),
@@ -195,13 +202,10 @@ function draw() {
       foods.push(newFood); // Push newFood constructor to foods array on frontend
 
       serverFoods.push(newFoodServerBlobType); // Push newFoodServerBlobType data object to serverFoods arrays for the server-side
+
+      socket.emit('updateFood', serverFoods); // Emit updateFood event only when a food is eaten
     }
   }
-
-  // As long as serverFoods length is > 0, send 'updateFood' event to server with serverFoods array
-  if (serverFoods.length > 0) {
-    socket.emit('updateFood', serverFoods);
-  };
 
   // Show the main player blob
   blob.show();
@@ -218,18 +222,4 @@ function draw() {
     r: blob.r,
   };
   socket.emit('updateBlob', data); // Send an 'updateBlob' event with blob's location data to the server-side
-}
-
-
-
-
-
-
-
-
-
-// ----- WINDOW RESIZE FUNCTION ----- //
-
-function windowResized() {
-  resizeCanvas(windowWidth, windowHeight);
 }
