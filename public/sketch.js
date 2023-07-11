@@ -21,7 +21,7 @@ function openNewWindow() {
 // ----- SETUP FUNCTION ----- //
 
 function setup() {
-  createCanvas(windowWidth, windowHeight); // Setup canvas size to size of browser tab
+  createCanvas(displayWidth, displayHeight); // Setup canvas size to size of browser tab
 
   // Start a socket connection to the server
   socket = io.connect("http://localhost:3000");
@@ -99,7 +99,7 @@ function draw() {
 
   // If blob.isVisible is true then allow blob to move around
   if (blob.isVisible) {
-    translate(width / 2, height / 2); // Translates origin of the coordinate system to the center of the canvas
+    translate(windowWidth / 2, windowHeight / 2); // Translates origin of the coordinate system to the center of the canvas
 
     // If blob radius is <= 42, zoom out. Otherwise, set to a constant zoom level
     if (blob.r <= 42) {

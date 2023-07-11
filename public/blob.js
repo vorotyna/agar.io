@@ -15,7 +15,7 @@ function Blob(x, y, r, colourR, colourG, colourB) {
 
   // A method to update the position of the blob based on the mouse position
   this.update = function() {
-    let newVel = createVector(mouseX - width / 2, mouseY - height / 2); // Represents the velocity of the Blob based on current mouse position
+    let newVel = createVector(mouseX - windowWidth / 2, mouseY - windowHeight / 2); // Represents the velocity of the Blob based on current mouse position
 
     // If Blob has eaten something, decrease the magnitude (i.e., slower) relative to the new radius
     if (this.hasEaten) {
