@@ -12,6 +12,9 @@ function Blob(id, x, y, r, colourR, colourG, colourB) {
   this.colourG = colourG;
 }
 
+
+
+
 // Using express: http://expressjs.com/
 let express = require('express');
 // Create the app
@@ -34,6 +37,12 @@ app.use(express.static('public'));
 // WebSocket Portion
 // WebSockets work with the HTTP server
 let io = require('socket.io')(server);
+
+
+
+
+
+
 
 // Server updates the frontend with the blobs and foods array every 30ms
 setInterval(heartbeat, 30);
@@ -59,7 +68,7 @@ io.sockets.on(
 
 
 
-    // ----- 'START' EVENT ----- //
+    // ----- 'START' EVENT ----- // 
 
     socket.on('start', function(data, foodsData) {
       console.log(`STARTING: ${socket.id} ${data.x} ${data.y} ${data.r}`);
