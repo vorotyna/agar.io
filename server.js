@@ -79,7 +79,7 @@ io.sockets.on(
       // Recreate the food blobs on the server-side and store in the foods array
       for (let i = 0; i < foodsData.length; i++) {
         // If foods array already has 250 food blobs in it, stop creating more
-        if (foods.length >= 250) {
+        if (foods.length >= 500) {
           break;
         }
 
