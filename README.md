@@ -2,7 +2,7 @@
 
 Created by [Alisa Vorotyntseva](https://github.com/vorotyna)
 
-Blobs.io is an agar.io clone built using JavaScript, p5.js, socket.io, and node.js. The web application allows users to compete against each other by consuming opponents' blobs.
+Blobs.io is an agar.io clone built using JavaScript, p5.js, Socket.IO, and Node.js. The web application allows users to compete against each other by consuming opponents' blobs.
 
 ### Main Menu (Two-Players)
 
@@ -22,7 +22,7 @@ Blobs.io is an agar.io clone built using JavaScript, p5.js, socket.io, and node.
 
 ## How It's Made:
 
-**Tech used:** JavaScipt, p5.js, node.js, sockets.io
+**Tech used:** JavaScript, p5.js, Node.js, Socket.IO
 
 ## Setup:
 
