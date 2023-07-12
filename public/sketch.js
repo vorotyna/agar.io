@@ -24,6 +24,8 @@ function openNewWindow() {
 
 
 
+
+
 // ----- SETUP FUNCTION ----- //
 
 function setup() {
@@ -50,12 +52,28 @@ function setup() {
   button.size(250, 40);
 
   button.mousePressed(begin);
+}
+
+
+
+
+
+
+
+
+// ----- BEGIN BUTTON FUNCTION ----- //
+
+function begin() {
+  blobName = nameInput.value(); // Save input name value
+  nameInput.value(''); // Set input name value to blank
+  nameInput.hide(); // Hide nameInput
+  button.hide(); // Hide begin button
 
 
   // Start a socket connection to the server
   socket = io.connect("http://localhost:3000");
 
-  // Cretae our main player Blob constructor
+  // Create our main player Blob constructor
   blob = new Blob(
     random(-width, width), // Random spawning location (x)
     random(-height, height), // Random spawning location (y)
@@ -67,6 +85,7 @@ function setup() {
 
   // Make an object with the main player blob's data to send to the server
   let data = {
+    blobName: blobName, // Send blobName to server
     x: blob.pos.x,
     y: blob.pos.y,
     r: blob.r,
@@ -88,6 +107,7 @@ function setup() {
 
     // Make an object with the food blob's data to send to the server
     let foodData = {
+      blobName: 'food', // Generic blobName for food
       x: food.pos.x,
       y: food.pos.y,
       r: food.r,
@@ -102,7 +122,7 @@ function setup() {
 
   socket.emit("start", data, foodsData); // On 'start' event, send data object with main player constructor and foodsData array (of foodData objects) to the server
 
-
+  gameStarted = true; // Start game
 
 
   // On the 'heartbeat' event (each 30ms), execute the following function
@@ -175,7 +195,7 @@ function draw() {
         fill(0); // Colour black
         textAlign(CENTER); // Align Id tag in the center
         textSize(5);
-        text(serverBlobs[i].id.substring(2, 9), serverBlobs[i].x, serverBlobs[i].y + serverBlobs[i].r); // Print Id tag that is a substring from index 2 to 9 
+        text(serverBlobs[i].blobName, serverBlobs[i].x, serverBlobs[i].y + serverBlobs[i].r); // Print Id tag that is the blobName
 
         // Handle Blob (main player) eating a serverBlob (another player)
         if (blob.eats(serverBlobs[i])) {
@@ -275,24 +295,7 @@ function drawMenu() {
   textFont("Raleway");
   textStyle(BOLD);
   text("WELCOME TO BLOBS.IO !", windowWidth / 2, windowHeight / 2 - 90);
-  textSize(18);
+  textSize(16);
   textStyle(NORMAL);
-  text("Move your mouse to control your blob.", windowWidth / 2, windowHeight / 2 + 20);
-
-  nameInput.show();
-  button.show();
-}
-
-
-
-
-
-// ----- BEGIN BUTTON FUNCTION ----- //
-
-function begin() {
-  blobName = nameInput.value();
-  nameInput.value('');
-  nameInput.hide();
-  button.hide();
-  gameStarted = true;
+  text("Move your mouse to control your blob.", windowWidth / 2, windowHeight / 2 + 15);
 }

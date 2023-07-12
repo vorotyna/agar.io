@@ -2,8 +2,9 @@ let blobs = []; // All of the clients that are currently connected
 let foods = []; // All of the food blobs that should be on the map
 
 // Blob constructor function on the server-side
-function Blob(id, x, y, r, colourR, colourG, colourB) {
+function Blob(id, blobName, x, y, r, colourR, colourG, colourB) {
   this.id = id;
+  this.blobName = blobName;
   this.x = x;
   this.y = y;
   this.r = r;
@@ -73,7 +74,7 @@ io.sockets.on(
     socket.on('start', function(data, foodsData) {
       console.log(`STARTING: ${socket.id} ${data.x} ${data.y} ${data.r}`);
 
-      let blob = new Blob(socket.id, data.x, data.y, data.r, data.colourR, data.colourG, data.colourB); // Recreate main player blob on the server side
+      let blob = new Blob(socket.id, data.blobName, data.x, data.y, data.r, data.colourR, data.colourG, data.colourB); // Recreate main player blob on the server side
       blobs.push(blob); // Push this new blob into our list of blobs / clients
 
       // Recreate the food blobs on the server-side and store in the foods array
@@ -83,7 +84,7 @@ io.sockets.on(
           break;
         }
 
-        let foodBlob = new Blob(i, foodsData[i].x, foodsData[i].y, foodsData[i].r, foodsData[i].colourR, foodsData[i].colourG, foodsData[i].colourB); // Create new food Blob using server-side constructor
+        let foodBlob = new Blob(i, foodsData[i].blobName, foodsData[i].x, foodsData[i].y, foodsData[i].r, foodsData[i].colourR, foodsData[i].colourG, foodsData[i].colourB); // Create new food Blob using server-side constructor
 
         foods.push(foodBlob); // Push foodBlob to server-side foods array
       }
