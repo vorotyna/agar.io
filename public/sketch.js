@@ -51,6 +51,9 @@ function setup() {
   button.position(windowWidth / 2 - 120, windowHeight / 2 + 70);
   button.size(250, 40);
 
+  button.elt.style.cursor = 'pointer'; // Add a pointer to the button when hovering
+
+
   button.mousePressed(begin);
 }
 
