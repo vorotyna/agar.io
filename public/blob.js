@@ -37,7 +37,7 @@ function Blob(x, y, r, colourR, colourG, colourB) {
       // Check if this blob is larger and can eat the other blob
       let sizeDifference = this.r - other.r;
 
-      if (sizeDifference > 3) {
+      if (sizeDifference > 2) {
         // If the radius is smaller or equal to 54
         if (this.r <= 54) {
           let sum = PI * this.r * this.r + PI * other.r * other.r; // Sum of areas of both blobs (i.e., A = PI * r^2)
