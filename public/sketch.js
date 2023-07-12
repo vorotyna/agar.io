@@ -49,7 +49,7 @@ function setup() {
   button.style('border-radius', '7px');
   button.style('font-size', '22px');
   button.position(windowWidth / 2 - 120, windowHeight / 2 + 70);
-  button.size(250, 40);
+  button.size(250, 45);
 
   button.elt.style.cursor = 'pointer'; // Add a pointer to the button when hovering
 
