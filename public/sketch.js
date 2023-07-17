@@ -98,7 +98,7 @@ function begin() {
   };
 
   // Create a loop where 500 food blobs are created into the foods array
-  for (let i = 0; i < 500; i++) {
+  for (let i = 0; i < 1250; i++) {
     let food = new Blob(
       random(-width, width), // Generate random x value that can be positioned within the canvas area or outside of it 
       random(-height, height), // Generate random y value that can be positioned within the canvas area or outside of it
@@ -300,5 +300,5 @@ function drawMenu() {
   text("WELCOME TO BLOBS.IO !", windowWidth / 2, windowHeight / 2 - 90);
   textSize(16);
   textStyle(NORMAL);
-  text("Move your mouse to control your blob.", windowWidth / 2, windowHeight / 2 + 15);
+  text("Drag and click your mouse to control your blob.", windowWidth / 2, windowHeight / 2 + 15);
 }
